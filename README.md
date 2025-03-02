@@ -1,6 +1,6 @@
 # docker-updater
 
-This script operates on the Docker Compose containers specified in the configuration file, pulling the latest updates for the container images in the stack. If any updates are found, it **restarts the entire Docker Compose stack** to apply the changes.
+This script operates on the Docker Compose containers specified in the configuration file, pulling the latest updates for the container images in the stack. If any updates are found, it **restarts the entire Docker Compose stack** to apply the changes. The obsolete images are pruned automatically.
 
 Additionally, it logs the process and sends an email notification when a restart occurs.
 

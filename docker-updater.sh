@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-VERSION="1"
+VERSION="2"
 
 CONFIG_DIR="$HOME/.config/docker-updater"
 
@@ -86,6 +86,9 @@ while IFS= read -r COMPOSE_PATH; do
     fi
 
 done < "$COMPOSE_LIST"
+
+echo "~~ Pruning obsolete images..." >> "$LOGFILE"
+docker image prune -a -f >> "$LOGFILE" 2>&1
 
 echo -e "\n-> Completed! <-" >> "$LOGFILE"
 
