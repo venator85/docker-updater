@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-VERSION="2"
+VERSION="3"
 
 CONFIG_DIR="$HOME/.config/docker-updater"
 
@@ -62,7 +62,7 @@ while IFS= read -r COMPOSE_PATH; do
     UPDATED=false
 
     for IMAGE in $IMAGES; do
-        echo "~~ Checking updates for $IMAGE" >> "$LOGFILE"
+        echo -e "\n~~ Checking updates for $IMAGE" >> "$LOGFILE"
         BEFORE=$(docker images --format '{{.Repository}}:{{.Tag}}@{{.Digest}}' | grep "^$IMAGE" || true)
         docker pull "$IMAGE" > /dev/null 2>&1
         AFTER=$(docker images --format '{{.Repository}}:{{.Tag}}@{{.Digest}}' | grep "^$IMAGE" || true)
@@ -75,6 +75,7 @@ while IFS= read -r COMPOSE_PATH; do
     done
 
     if [ "$UPDATED" = true ]; then
+        echo >> "$LOGFILE"
         if [ "$STACK_RUNNING" = true ]; then
             echo "   Restarting docker-compose in $COMPOSE_FILE..." >> "$LOGFILE"
             docker compose -f "$COMPOSE_FILE" down >> "$LOGFILE" 2>&1
@@ -87,10 +88,11 @@ while IFS= read -r COMPOSE_PATH; do
 
 done < "$COMPOSE_LIST"
 
-echo "~~ Pruning obsolete images..." >> "$LOGFILE"
+echo -e "\n~~ Pruning obsolete images..." >> "$LOGFILE"
 docker image prune -a -f >> "$LOGFILE" 2>&1
 
 echo -e "\n-> Completed! <-" >> "$LOGFILE"
+echo -e "$(date)\n" >> "$LOGFILE"
 
 if [ "$GLOBALLY_UPDATED" = true ]; then
     cat "$LOGFILE" | mail -s "[docker-updater @ $(hostname)] Docker update report - Updates applied" "$EMAIL"
